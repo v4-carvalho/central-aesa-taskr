@@ -4,7 +4,8 @@
   "description": "Central de tarefas, testes, campanhas e atas dos clientes AESA e Taskr (V4 Carvalho).",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "prisma generate"
   },
   "repository": {
     "type": "git",
