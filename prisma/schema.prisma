@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Espelha a collection "items" usada em index.html (task | test | campaign | meeting)
+model Item {
+  id           String   @id @default(cuid())
+  kind         String // task | test | campaign | meeting
+  client       String // aesa | taskr
+  title        String   @default("")
+  status       String   @default("")
+  side         String   @default("")
+  owner        String   @default("")
+  notes        String   @default("")
+  due          String   @default("") // AAAA-MM-DD
+  start        String   @default("")
+  date         String   @default("") // atas
+  platform     String   @default("")
+  variable     String   @default("")
+  objective    String   @default("")
+  budget       String   @default("")
+  kpi          String   @default("")
+  participants String   @default("")
+  summary      String   @default("")
+  decisions    String   @default("")
+  next         String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([client, kind])
+  @@map("items")
+}

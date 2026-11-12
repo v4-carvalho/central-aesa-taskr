@@ -333,12 +333,13 @@ render();
 
 (async()=>{
   const timer=setTimeout(()=>{if(!loaded){dbOk=false;const n=$('#notice');n.hidden=false;n.textContent='Não consegui carregar os dados. Abra a página logado no Claude para ver e editar a central.';render()}},10000);
-  db=await window.claude?.use?.('db');
-  if(!db){clearTimeout(timer);dbOk=false;const n=$('#notice');n.hidden=false;n.textContent='Os dados só aparecem para quem está logado no Claude com acesso a esta página.';render();return}
-  col=db.collection('items');
-  col.onSnapshot(snap=>{clearTimeout(timer);loaded=true;dbOk=true;$('#notice').hidden=true;
-    ITEMS=snap.docs.map(d=>({...d.data(),id:d.id}));render()},
-    err=>{clearTimeout(timer);fail(err)});
+  const api=async(m,id,body)=>{const r=await fetch('/api/items'+(id?'?id='+encodeURIComponent(id):''),{method:m,headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});
+    if(!r.ok)throw new Error('http '+r.status);return r.status===204?null:r.json()};
+  const pull=async()=>{try{ITEMS=await api('GET');clearTimeout(timer);loaded=true;dbOk=true;$('#notice').hidden=true;render()}catch(e){if(!loaded){clearTimeout(timer);dbOk=false;const n=$('#notice');n.hidden=false;n.textContent='Não consegui carregar os dados do banco.';render()}}};
+  const run=p=>p.then(r=>{pull();return r});
+  col={add:d=>run(api('POST',null,d)),
+    doc:id=>({delete:()=>run(api('DELETE',id)),set:d=>run(api('PUT',id,d)),update:d=>run(api('PATCH',id,d))})};
+  pull();setInterval(pull,15000);
 })();
 </script>
 
